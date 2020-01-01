@@ -6,3 +6,6 @@ node_js:
 
 before_script:
   - cd todo && npm install
+
+script:
+  - echo Success!
