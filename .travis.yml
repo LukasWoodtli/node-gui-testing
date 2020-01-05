@@ -5,7 +5,7 @@ node_js:
   - 11
 
 before_script:
-  - cd todo && npm install
+  - cd "$TRAVIS_BUILD_DIR/todo" && npm install
 
 script:
-  - echo Success!
+  - cd "$TRAVIS_BUILD_DIR/todo" && npm test

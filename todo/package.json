@@ -12,11 +12,13 @@
     "flatware-session": "0.1.x"
   },
   "devDependencies": {
-    "api-easy": "0.3.2",
-    "vows": "0.6.x"
+    "mocha": "7.0.0",
+    "zombie": "6.1.4",
+    "request": "2.83",
+    "wtfnode": "0.8.1"
   },
   "scripts": {
-    "test": "vows --spec",
+    "test": "mocha --exit test/users.js",
     "start": "node app.js"
   },
   "name": "todo",
