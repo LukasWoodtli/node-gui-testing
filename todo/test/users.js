@@ -20,8 +20,7 @@ describe("Users", function () {
     describe("Signup Form", function () {
         it("should load the signup form", function (done) {
             var browser = new Browser();
-            browser.visit("http://localhost:3000/users/new", function (err, browser) {
-                if (err) throw err;
+            browser.visit("http://localhost:3000/users/new", function () {
                 assert.ok(browser.success, "page loaded");
                 done();
             });
