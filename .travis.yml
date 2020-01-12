@@ -8,8 +8,7 @@ services:
   - couchdb
 
 before_script:
-  - sleep 15  # wait for CouchDB
-  - curl http://localhost:5984/  # check CouchDB
+  - while [ '200' != $(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:5984) ]; do echo waiting for couch to load... ; sleep 1; done  # wait for CouchDB
   - cd "$TRAVIS_BUILD_DIR/todo" && npm install
 
 script:
