@@ -9,7 +9,7 @@ services:
 
 before_script:
   - sleep 15  # wait for CouchDB
-  - curl -X PUT localhost:5984/myapp_test  # check CouchDB
+  - curl http://localhost:5984/  # check CouchDB
   - cd "$TRAVIS_BUILD_DIR/todo" && npm install
 
 script:
