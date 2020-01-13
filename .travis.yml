@@ -5,18 +5,12 @@ language: node_js
 node_js:
   - 11
 
-addons:
-  apt:
-    sources:
-      - https://apache.bintray.com/couchdb-deb
-    packages:
-      - couchdb
-
-before_install:
-  - sudo apt-get install -y couchdb
-  - sudo service couchdb restart
+services:
+  - docker
 
 before_script:
+  - docker pull docker pull couchdb:2.3.1
+  - docker run -d -p 5984:5984 couchdb:2.3.1 --with-haproxy --with-admin-party-please -n 1
   - while [ '200' != $(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:5984) ]; do echo waiting for couch to load... ; sleep 1; done # wait for CouchDB
   - cd "$TRAVIS_BUILD_DIR/todo" && npm install
 
