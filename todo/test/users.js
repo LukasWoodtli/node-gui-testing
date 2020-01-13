@@ -15,7 +15,7 @@ describe("Users", function () {
     before(function (done) {
         app.start(3000, done);
     });
-    
+
     after(function (done) {
         app.server.close(done);
         // see top of file:
@@ -24,8 +24,8 @@ describe("Users", function () {
 
     describe("Signup Form", function () {
 
-        before(function(done) {
-            db.get(fixtures.user.email, function(err, doc) {
+        before(function (done) {
+            db.get(fixtures.user.email, function (err, doc) {
                 if (err && err.status_code === 404) return done();
                 if (err) throw err;
                 db.destroy(doc._id, doc._rev, done);
@@ -39,7 +39,7 @@ describe("Users", function () {
                     'x-test-2': 'Test 234'
                 },
                 debug: true,
-                maxWait: '1ms'
+                maxWait: '10s'
             };
             var browser = new Browser();
             browser.visit("http://localhost:3000/users/new", options, function (err) {
@@ -68,7 +68,7 @@ describe("Users", function () {
         });
 
         it("should submit", function (done) {
-            Browser.visit("http://localhost:3000/users/new", function (err, browser) {
+            Browser.visit("http://localhost:3000/users/new", { maxWait: '10s' }, function (err, browser) {
                 if (err) throw err;
 
                 /* It would be possible to use `browser.fill('#email', 'me@email.com')` and 
@@ -87,7 +87,7 @@ describe("Users", function () {
                     assert(browser.query('a[href="/session/new"]'), 'has login link');
                     done();
                 });
-            }); 
+            });
         });
     })
 });
