@@ -5,7 +5,7 @@
   "dependencies": {
     "flatiron": "0.4.3",
     "node-static": "0.6.0",
-    "nano": "3.3.0",
+    "nano": "8.0.1",
     "plates": "0.4.x",
     "union": "^0.5.0",
     "flatware-cookie-parser": "0.1.x",

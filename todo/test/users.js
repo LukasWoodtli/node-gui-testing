@@ -26,7 +26,7 @@ describe("Users", function () {
 
         before(function (done) {
             db.get(fixtures.user.email, function (err, doc) {
-                if (err && err.status_code === 404) return done();
+                if (err && err.statusCode === 404) return done();
                 if (err) throw err;
                 db.destroy(doc._id, doc._rev, done);
             });
@@ -71,7 +71,7 @@ describe("Users", function () {
             Browser.visit("http://localhost:3000/users/new", { maxWait: '10s' }, function (err, browser) {
                 if (err) throw err;
 
-                /* It would be possible to use `browser.fill('#email', 'me@email.com')` and 
+                /* It would be possible to use `browser.fill('#email', 'me@email.com')` and
                 ** `browser.fill('#password', 'mypassword')`.
                 ** But the labels for each text field are using a `for` attribute that
                 ** indicates the `id` attribute of the tag it belongs to.
