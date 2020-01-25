@@ -17,8 +17,8 @@ describe('Session', function () {
     describe('Log in form', function () {
         before(function (done) {
             db.get(fixtures.user.email, function (err, doc) {
+                console.log('Before:');
                 console.log(err);
-                console.log(doc);
                 if (err && (err.status_code === 404 || err.statusCode === 404)) {
                     return db.insert(fixtures.user, fixtures.user.email, done);
                 }
@@ -54,6 +54,8 @@ describe('Session', function () {
                 browser.fill('E-mail', fixtures.user.email);
                 browser.fill('Password', fixtures.user.password);
                 browser.pressButton('Log In', function (err) {
+                    console.log("Press Button:");
+                    console.log(err);
                     if (err) throw err;
                     assert.equal(browser.location.pathname, '/todos', 'should be redirected to /todos');
                     done();
