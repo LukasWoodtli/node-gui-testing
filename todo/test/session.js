@@ -60,5 +60,23 @@ describe('Session', function () {
                 });
             });
         });
+
+        it('should not allow you to lon with wrong password', function (done) {
+            Browser.visit('http://localhost:3000/session/new', function (err, browser) {
+                if (err) throw err;
+
+                browser.fill('E-mail', fixtures.user.email);
+                browser.fill('Password', fixtures.user.password + 'thisisnotmypassword');
+
+
+                browser.pressButton('Log In', function (err) {
+                    assert(err, 'expected an error');
+                    assert((browser.statusCode === 403) || (browser.status_code === 403), 'replied with 403 status code');
+                    assert.equal(browser.location.pathname, '/session');
+                    assert.equal(browser.text('#messages .alert .message'), "Invalid password");
+                    done();
+                });
+            });
+        });
     });
 });
