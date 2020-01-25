@@ -26,7 +26,7 @@ describe("Users", function () {
 
         before(function (done) {
             db.get(fixtures.user.email, function (err, doc) {
-                if (err && err.statusCode === 404) return done();
+                if (err && (err.status_code === 404 || err.statusCode === 404)) return done();
                 if (err) throw err;
                 db.destroy(doc._id, doc._rev, done);
             });

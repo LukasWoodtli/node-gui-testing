@@ -17,7 +17,7 @@ describe('Session', function () {
     describe('Log in form', function () {
         before(function (done) {
             db.get(fixtures.user.email, function (err, doc) {
-                if (err && err.statusCode === 404) {
+                if (err && (err.status_code === 404 || err.statusCode === 404)) {
                     return db.insert(fixtures.user, fixtures.user.email, done);
                 }
                 if (err) throw err;

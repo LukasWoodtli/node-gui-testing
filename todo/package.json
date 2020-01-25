@@ -18,7 +18,7 @@
     "wtfnode": "0.8.1"
   },
   "scripts": {
-    "test": "mocha --exit test/users.js test/session.js",
+    "test": "mocha -C --full-trace --exit test/users.js test/session.js",
     "start": "node app.js"
   },
   "name": "todo",
