@@ -21,18 +21,12 @@ function insert(email, todo, callback) {
         tries++;
         if (tries >= 3) return callback(lastError);
         db.get(email, function (err, todos) {
-            console.log("db get e-mail");
-            console.log(err);
-            console.log("todos");
-            console.log(todos);
             if (err && err.status_code !== 404) return callback(err);
             if (!todos) todos = { todos: [] };
             todos.todos.unshift(todo);
 
             db.insert(todos, email, function (err) {
                 if (err) {
-                    console.log("database does not exist!");
-                    console.log(err);
                     if (err.status_code === 404) {
                         lastError = err;
                         // database does not exist, need to create it
@@ -56,9 +50,6 @@ module.exports = function () {
     this.get('/', [loggedIn, function () {
         var res = this.res;
         db.get(this.req.session.user.email, function (err, todos) {
-            console.log("loggedIn");
-            console.log(err);
-            console.log(todos);
             if (err && (err.status_code || err.statusCode) !== 404) {
                 res.writeHead(500);
                 return res.end(err.stack);
@@ -111,8 +102,6 @@ module.exports = function () {
             ;
         db.get(this.req.session.user.email, function (err, todosDoc) {
 
-            console.log("sort");
-            console.log(err);
             if (err) {
                 res.writeHead(500);
                 return res.end(err.stack);

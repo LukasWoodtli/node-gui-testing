@@ -46,14 +46,11 @@ describe('Session', function () {
 
         it('should allow you to log in', function (done) {
             Browser.visit('http://localhost:3000/session/new', function (err, browser) {
-                console.log(err);
                 if (err) throw err;
 
                 browser.fill('E-mail', fixtures.user.email);
                 browser.fill('Password', fixtures.user.password);
                 browser.pressButton('Log In', function (err) {
-                    console.log("Press Button:");
-                    console.log(err);
                     if (err) throw err;
                     assert.equal(browser.location.pathname, '/todos', 'should be redirected to /todos');
                     done();
