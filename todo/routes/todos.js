@@ -27,6 +27,8 @@ function insert(email, todo, callback) {
 
             db.insert(todos, email, function (err) {
                 if (err) {
+                    console.log("database does not exist!");
+                    console.log(err);
                     if (err.status_code === 404) {
                         lastError = err;
                         // database does not exist, need to create it
