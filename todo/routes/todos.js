@@ -59,7 +59,7 @@ module.exports = function () {
             console.log("loggedIn");
             console.log(err);
             console.log(todos);
-            if (err && err.status_code !== 404) {
+            if (err && (err.status_code || err.statusCode) !== 404) {
                 res.writeHead(500);
                 return res.end(err.stack);
             }
