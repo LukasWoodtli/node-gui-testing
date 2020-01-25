@@ -17,6 +17,8 @@ describe('Session', function () {
     describe('Log in form', function () {
         before(function (done) {
             db.get(fixtures.user.email, function (err, doc) {
+                console.log(err);
+                console.log(doc);
                 if (err && (err.status_code === 404 || err.statusCode === 404)) {
                     return db.insert(fixtures.user, fixtures.user.email, done);
                 }
@@ -46,6 +48,7 @@ describe('Session', function () {
 
         it('should allow you to log in', function (done) {
             Browser.visit('http://localhost:3000/session/new', function (err, browser) {
+                console.log(err);
                 if (err) throw err;
 
                 browser.fill('E-mail', fixtures.user.email);
