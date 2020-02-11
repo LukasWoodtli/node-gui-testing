@@ -25,7 +25,7 @@ module.exports = function () {
         }
         db.get(login.email, function (err, user) {
             if (err) {
-                if (err.status_code === 404) {
+                if (err.status_code === 404 || err.statusCode === 404) {
                     // User was not found
                     return res.end(layout(templates['new'], 'Log In',
                         { error: 'No such user' }));

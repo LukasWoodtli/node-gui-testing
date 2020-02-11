@@ -50,7 +50,7 @@ module.exports = function () {
     this.get('/', [loggedIn, function () {
         var res = this.res;
         db.get(this.req.session.user.email, function (err, todos) {
-            if (err && (err.status_code || err.statusCode) !== 404) {
+            if (err && (err.status_code !== 404 && err.statusCode !== 404)) {
                 res.writeHead(500);
                 return res.end(err.stack);
             }
