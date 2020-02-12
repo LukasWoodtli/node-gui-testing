@@ -79,7 +79,6 @@ describe('Todos', function () {
 
         it('should allow to create a todo', login(function (browser, done) {
             browser.visit("http://localhost:3000/todos/new", function (err, Browser) {
-            console.log(err);    
             if (err) throw err;
 
                 browser.fill('what', 'Laundry');

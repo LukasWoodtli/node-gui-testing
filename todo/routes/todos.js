@@ -21,13 +21,13 @@ function insert(email, todo, callback) {
         tries++;
         if (tries >= 3) return callback(lastError);
         db.get(email, function (err, todos) {
-            if (err && err.status_code !== 404) return callback(err);
+            if (err && !(err.status_code === 404 || err.statusCode === 404)) return callback(err);
             if (!todos) todos = { todos: [] };
             todos.todos.unshift(todo);
 
             db.insert(todos, email, function (err) {
                 if (err) {
-                    if (err.status_code === 404) {
+                    if (err.status_code === 404 || err.statusCode === 404) {
                         lastError = err;
                         // database does not exist, need to create it
                         couchdb.db.create(dbName, function (err) {
@@ -50,7 +50,7 @@ module.exports = function () {
     this.get('/', [loggedIn, function () {
         var res = this.res;
         db.get(this.req.session.user.email, function (err, todos) {
-            if (err && (err.status_code !== 404 && err.statusCode !== 404)) {
+            if (err && !(err.status_code === 404 || err.statusCode === 404)) {
                 res.writeHead(500);
                 return res.end(err.stack);
             }
@@ -87,7 +87,8 @@ module.exports = function () {
 
         todo.created_at = Date.now();
         insert(req.session.user.email, todo, function (err) {
-            if (err) {
+
+            if (err && !(err.status_code === 404 || err.statusCode === 404)) {
                 res.writeHead(500);
                 return res.end(err.stack);
             }
