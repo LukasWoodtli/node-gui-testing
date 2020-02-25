@@ -24,3 +24,5 @@ before_script:
 
 script:
   - cd "$TRAVIS_BUILD_DIR/todo" && npm test
+  # for debugging:
+  # cd "$TRAVIS_BUILD_DIR/todo" && DEBUG=zombie npm test

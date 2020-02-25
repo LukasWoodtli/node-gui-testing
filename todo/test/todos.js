@@ -134,6 +134,11 @@ describe('Todos', function () {
                         browser.choose('Use Alarm', function (err) {
                             if (err) throw err;
 
+                            // useful for debugging:
+                            // browser.dump();
+                            // or even:
+                            // console.log(browser.html());
+
                             assert.equal(container.style.display, 'none');  // don't know why this is 'none' with zombie.js
 
                             browser.choose('No Alarm', function (err) {
