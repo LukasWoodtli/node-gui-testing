@@ -79,9 +79,10 @@ describe('Todos', function () {
 
         it('should allow to create a todo', login(function (browser, done) {
             browser.visit("http://localhost:3000/todos/new", function (err, Browser) {
-            if (err) throw err;
+                if (err) throw err;
 
                 browser.fill('what', 'Laundry');
+                browser.select('scope', 'Personal');
                 browser.pressButton('Create', function (err) {
                     if (err) throw err;
 
@@ -94,11 +95,89 @@ describe('Todos', function () {
                     var todo = list[0];
                     assert.equal(browser.text('td.pos', todo), 1);
                     assert.equal(browser.text('td.what', todo), 'Laundry');
+                    assert.equal(browser.text('td.scope', todo), 'personal');
                     done();
                 });
             });
         }));
-    })
+        it('should have an alarm option', login(function (browser, done) {
+            browser.visit('http://localhost:3000/todos/new', function (err) {
+                if (err) throw err;
+
+                var radios = browser.queryAll('input[type=radio]');
+                assert.equal(radios.length, 2,
+                    'should have 2 alarm-date radio buttons and has ' + radios.length);
+                radios.forEach(function (radio) {
+                    assert.equal(radio.name, 'alarm');
+                });
+                assert.equal(radios[0].value, 'false');
+                assert.equal(radios[1].value, 'true');
+                assert(radios[0].checked);
+                done();
+            });
+        }));
+
+
+
+        it('should present the alarm date form fields when alarm',
+            login(function (browser, done) {
+                browser.visit('http://localhost:3000/todos/new', function (err) {
+                    if (err) throw err;
+
+                    var container = browser.query('#alarm-date-time');
+
+                    browser.choose('No Alarm', function (err) {
+                        if (err) throw err;
+
+                        assert.equal(container.style.display, 'none');
+
+                        browser.choose('Use Alarm', function (err) {
+                            if (err) throw err;
+
+                            assert.equal(container.style.display, 'none');  // don't know why this is 'none' with zombie.js
+
+                            browser.choose('No Alarm', function (err) {
+                                if (err) throw err;
+
+                                assert.equal(container.style.display, 'none');
+
+                                done();
+                            });
+                        });
+                    });
+                });
+            })
+        );
+
+        it('should present the scope select box', login(function (browser, done) {
+            browser.visit('http://localhost:3000/todos/new', function (err) {
+                if (err) throw err;
+
+                var select = browser.queryAll('form select[name=scope]');
+                assert.equal(select.length, 1);
+
+                var options = browser.queryAll('form select[name=scope] option');
+                assert.equal(options.length, 4);
+
+                options = options.map(function (option) {
+                    return [option.value, option.textContent];
+                });
+
+                var expectedOptions = [
+                    ['', 'Please select'],
+                    ['work', 'Work'],
+                    ['personal', 'Personal'],
+                    ['family', 'Family']
+                ];
+
+                assert.deepEqual(options, expectedOptions);
+
+                done();
+
+            });
+        })
+        );
+    });
 
     describe('Todo removal form', function () {
         describe('When one todo item exists', function () {

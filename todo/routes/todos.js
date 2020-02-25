@@ -1,5 +1,3 @@
-
-
 var fs = require('fs'),
     couchdb = require('../lib/couchdb'),
     dbName = 'todos',
@@ -14,23 +12,24 @@ var templates = {
     'new': fs.readFileSync(__dirname +
         '/../templates/todos/new.html', 'utf8')
 };
+
 function insert(email, todo, callback) {
     var tries = 0,
         lastError;
     (function doInsert() {
         tries++;
         if (tries >= 3) return callback(lastError);
-        db.get(email, function (err, todos) {
+        db.get(email, function(err, todos) {
             if (err && !(err.status_code === 404 || err.statusCode === 404)) return callback(err);
             if (!todos) todos = { todos: [] };
             todos.todos.unshift(todo);
 
-            db.insert(todos, email, function (err) {
+            db.insert(todos, email, function(err) {
                 if (err) {
                     if (err.status_code === 404 || err.statusCode === 404) {
                         lastError = err;
                         // database does not exist, need to create it
-                        couchdb.db.create(dbName, function (err) {
+                        couchdb.db.create(dbName, function(err) {
                             if (err) {
                                 return callback(err);
                             }
@@ -46,17 +45,17 @@ function insert(email, todo, callback) {
         });
     })();
 }
-module.exports = function () {
-    this.get('/', [loggedIn, function () {
+module.exports = function() {
+    this.get('/', [loggedIn, function() {
         var res = this.res;
-        db.get(this.req.session.user.email, function (err, todos) {
+        db.get(this.req.session.user.email, function(err, todos) {
             if (err && !(err.status_code === 404 || err.statusCode === 404)) {
                 res.writeHead(500);
                 return res.end(err.stack);
             }
             if (!todos) todos = { todos: [] };
             todos = todos.todos;
-            todos.forEach(function (todo, idx) {
+            todos.forEach(function(todo, idx) {
                 if (todo) todo.pos = idx + 1;
             });
 
@@ -64,6 +63,7 @@ module.exports = function () {
             map.className('todo').to('todo');
             map.className('pos').to('pos');
             map.className('what').to('what');
+            map.className('scope').to('scope');
             map.where('name').is('pos').use('pos').as('value');
             var main = Plates.bind(templates.index, { todo: todos }, map);
             res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -71,24 +71,28 @@ module.exports = function () {
         });
     }]);
 
-    this.get('/new', [loggedIn, function () {
+    this.get('/new', [loggedIn, function() {
         this.res.writeHead(200, { 'Content-Type': 'text/html' });
         this.res.end(layout(templates['new'], 'New To-Do'));
     }]);
-    this.post('/', [loggedIn, function () {
+    this.post('/', [loggedIn, function() {
         var req = this.req,
             res = this.res,
             todo = this.req.body;
         if (!todo.what) {
             res.writeHead(200, { 'Content-Type': 'text/html' });
-            return res.end(layout(templates['new'], 'New To-Do',
-                { error: 'Please fill in the To-Do description' }));
+            return res.end(layout(templates['new'], 'New To-Do', { error: 'Please fill in the To-Do description' }));
         }
 
-        todo.created_at = Date.now();
-        insert(req.session.user.email, todo, function (err) {
+        todo.alarm = todo.alarm === 'true';
+        todo.alarm_date = Date.parse(todo['alarm-date'] + ' ' + todo['alarm-time']);
+        delete todo['alarm-date'];
+        delete todo['alarm-time'];
 
-            if (err && !(err.status_code === 404 || err.statusCode === 404)) {
+        todo.created_at = Date.now();
+        insert(req.session.user.email, todo, function(err) {
+
+      if (err) {
                 res.writeHead(500);
                 return res.end(err.stack);
             }
@@ -96,12 +100,12 @@ module.exports = function () {
             res.end();
         });
     }]);
-    this.post('/sort', [loggedIn, function () {
+    this.post('/sort', [loggedIn, function() {
         var res = this.res,
             order = this.req.body.order && this.req.body.order.split(','),
-            newOrder = []
-            ;
-        db.get(this.req.session.user.email, function (err, todosDoc) {
+            newOrder = [];
+
+        db.get(this.req.session.user.email, function(err, todosDoc) {
 
             if (err) {
                 res.writeHead(500);
@@ -112,11 +116,11 @@ module.exports = function () {
                 res.writeHead(409);
                 return res.end('Conflict');
             }
-            order.forEach(function (order) {
+            order.forEach(function(order) {
                 newOrder.push(todos[parseInt(order, 10) - 1]);
             });
             todosDoc.todos = newOrder;
-            db.insert(todosDoc, function (err) {
+            db.insert(todosDoc, function(err) {
                 if (err) {
                     res.writeHead(500);
                     return res.end(err.stack);
@@ -127,11 +131,11 @@ module.exports = function () {
         });
     }]);
 
-    this.post('/delete', [loggedIn, function () {
+    this.post('/delete', [loggedIn, function() {
         var req = this.req,
             res = this.res,
             pos = parseInt(req.body.pos, 10);
-        db.get(this.req.session.user.email, function (err, todosDoc) {
+        db.get(this.req.session.user.email, function(err, todosDoc) {
             if (err) {
                 res.writeHead(500);
                 return res.end(err.stack);
@@ -139,7 +143,7 @@ module.exports = function () {
 
             var todos = todosDoc.todos;
             todosDoc.todos = todos.slice(0, pos - 1).concat(todos.slice(pos));
-            db.insert(todosDoc, function (err) {
+            db.insert(todosDoc, function(err) {
                 if (err) {
                     res.writeHead(500);
                     return res.end(err.stack);
