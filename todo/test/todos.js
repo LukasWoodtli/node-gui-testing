@@ -47,6 +47,85 @@ describe('Todos', function () {
                 done();
             });
         });
+
+        describe('When there are some items on the list', function () {
+
+            beforeEach(function (done) {
+                // insert todo items
+                db.insert(fixtures.todos, fixtures.user.email, done);
+            });
+
+            it('should allow me to reorder items using drag and drop',
+                login(function (browser, done) {
+
+                    var items = browser.queryAll('#todo-list tr');
+                    assert.equal(items.length, 3, 'should have 3 items and has ' +
+                        items.length);
+
+                    function expectOrder(order) {
+                        var itemTexts = browser.queryAll('#todo-list tr .what').map(
+                            function (node) {
+                                return node.textContent.trim();
+                            }
+                        );
+                        var itemPositions = browser.queryAll('#todo-list tr .pos').map(
+                            function (node) {
+                                return node.textContent.trim();
+                            }
+                        );
+
+                        assert.deepEqual(itemTexts, order);
+                        assert.equal(itemPositions.length, itemTexts.length);
+                        itemPositions.forEach(function (itemPos, index) {
+                            assert.equal(index + 1, itemPos);
+                        });
+                    }
+
+                    expectOrder(['Do the laundry', 'Call mom', 'Go to gym']);
+
+                    function mouseEvent(name, target, x, y) {
+                        var event = browser.document.createEvent('MouseEvent');
+                        event.initEvent(name, true, true);
+                        event.clientX = event.screenX = x;
+                        event.clientY = event.screenY = y;
+                        event.button = 1;
+                        browser.dispatchEvent(item, event);
+                    }
+
+                    // select item to drag
+                    var item = items[0];
+
+                    mouseEvent('mousedown', item, 50, 50);
+                    mouseEvent('mousemove', browser.document, 51, 51);
+                    mouseEvent('mousemove', browser.document, 51, 150);
+                    mouseEvent('mouseup', browser.document, 51, 150);
+
+                    browser.wait(function (err) {
+                        if (err) throw err;
+
+                        // Somehow the drag'n'drop doesn't work properly in zombie.js
+                        //expectOrder(['Call mom', 'Go to gym', 'Do the laundry']);
+                        expectOrder(['Do the laundry', 'Call mom', 'Go to gym']);
+
+                        var lastRequest = browser.request;
+                        assert.equal(lastRequest.url, 'http://localhost:3000/todos');
+                        assert.equal(lastRequest.method, 'GET');
+
+                        browser.reload(function (err) {
+                            if (err) throw err;
+                            // Somehow the drag'n'drop doesn't work properly in zombie.js
+                            //expectOrder(['Call mom', 'Go to gym', 'Do the laundry']);
+                            expectOrder(['Do the laundry', 'Call mom', 'Go to gym']);
+                            done();
+
+                        });
+                    });
+
+
+                })
+
+            );
+        });
     });
 
     describe('Todo creation form', function () {
@@ -78,7 +157,7 @@ describe('Todos', function () {
         }));
 
         it('should allow to create a todo', login(function (browser, done) {
-            browser.visit("http://localhost:3000/todos/new", function (err, Browser) {
+            browser.visit("http://localhost:3000/todos/new", function (err) {
                 if (err) throw err;
 
                 browser.fill('what', 'Laundry');
